@@ -63,12 +63,15 @@ class ISICLoader(data.Dataset):
         return img, lbl if self.split == "training" else None
 
     def encode_segmap(self, mask):
+        # TODO
         return np.where(mask >= 127, 255, 0)
 
     def decode_segmap(self, temp, plot=False):
+        # TODO 
         return temp
 
     def transform(self, img, lbl):
+        # TODO colors dont seem right
         img = m.imresize(img, (self.img_size[0], self.img_size[1]))
 
         # NHWC -> NCHW
