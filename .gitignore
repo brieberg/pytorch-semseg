@@ -10,6 +10,7 @@ current_train.py
 video_test*.py
 *.swp
 data
+data/**
 ckpt
 
 # C extensions
