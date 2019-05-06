@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     augmentations = Compose([Scale(512), RandomRotate(10), RandomHorizontallyFlip()])
 
-    local_path = "/home/meet/datasets/NYUv2/"
+    local_path = "/home/meet/dataset/NYUv2/"
     dst = NYUv2Loader(local_path, is_transform=True, augmentations=augmentations)
     bs = 4
     trainloader = data.DataLoader(dst, batch_size=bs, num_workers=0)

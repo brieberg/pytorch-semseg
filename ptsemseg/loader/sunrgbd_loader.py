@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     augmentations = Compose([Scale(512), RandomRotate(10), RandomHorizontallyFlip()])
 
-    local_path = "/home/meet/datasets/SUNRGBD/"
+    local_path = "/home/meet/dataset/SUNRGBD/"
     dst = SUNRGBDLoader(local_path, is_transform=True, augmentations=augmentations)
     bs = 4
     trainloader = data.DataLoader(dst, batch_size=bs, num_workers=0)

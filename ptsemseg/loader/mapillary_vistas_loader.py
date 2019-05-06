@@ -118,7 +118,7 @@ class mapillaryVistasLoader(data.Dataset):
 if __name__ == "__main__":
     augment = Compose([RandomHorizontallyFlip(), RandomRotate(6)])
 
-    local_path = "/private/home/meetshah/datasets/seg/vistas/"
+    local_path = "/private/home/meetshah/dataset/seg/vistas/"
     dst = mapillaryVistasLoader(
         local_path, img_size=(512, 1024), is_transform=True, augmentations=augment
     )

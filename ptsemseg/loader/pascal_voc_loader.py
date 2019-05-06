@@ -70,7 +70,7 @@ class pascalVOCLoader(data.Dataset):
                 file_list = tuple(open(path, "r"))
                 file_list = [id_.rstrip() for id_ in file_list]
                 self.files[split] = file_list
-            self.setup_annotations()
+            # self.setup_annotations()
 
         self.tf = transforms.Compose(
             [
@@ -232,7 +232,7 @@ class pascalVOCLoader(data.Dataset):
 # Leave code for debugging purposes
 # import ptsemseg.augmentations as aug
 # if __name__ == '__main__':
-# # local_path = '/home/meetshah1995/datasets/VOCdevkit/VOC2012/'
+# # local_path = '/home/meetshah1995/dataset/VOCdevkit/VOC2012/'
 # bs = 4
 # augs = aug.Compose([aug.RandomRotate(10), aug.RandomHorizontallyFlip()])
 # dst = pascalVOCLoader(root=local_path, is_transform=True, augmentations=augs)

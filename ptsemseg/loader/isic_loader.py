@@ -67,7 +67,7 @@ class ISICLoader(data.Dataset):
         return np.where(mask >= 127, 255, 0)
 
     def decode_segmap(self, temp, plot=False):
-        # TODO 
+        # TODO
         return temp
 
     def transform(self, img, lbl):

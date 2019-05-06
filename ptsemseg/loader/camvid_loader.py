@@ -120,7 +120,7 @@ class camvidLoader(data.Dataset):
 
 
 if __name__ == "__main__":
-    local_path = "/home/meetshah1995/datasets/segnet/CamVid"
+    local_path = "/home/meetshah1995/dataset/segnet/CamVid"
     augmentations = Compose([RandomRotate(10), RandomHorizontallyFlip()])
 
     dst = camvidLoader(local_path, is_transform=True, augmentations=augmentations)
