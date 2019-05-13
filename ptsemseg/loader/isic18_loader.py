@@ -11,7 +11,7 @@ from torch.utils import data
 from ptsemseg.utils import recursive_glob
 
 
-class ISICLoader(data.Dataset):
+class ISIC18Loader(data.Dataset):
     def __init__(self,
                  root,
                  split="training",

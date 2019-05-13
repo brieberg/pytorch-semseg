@@ -8,6 +8,7 @@ from ptsemseg.loader.cityscapes_loader import cityscapesLoader
 from ptsemseg.loader.nyuv2_loader import NYUv2Loader
 from ptsemseg.loader.sunrgbd_loader import SUNRGBDLoader
 from ptsemseg.loader.mapillary_vistas_loader import mapillaryVistasLoader
+from ptsemseg.loader.isic18_loader import ISIC18Loader
 
 
 def get_loader(name):
@@ -18,6 +19,7 @@ def get_loader(name):
     return {
         "pascal": pascalVOCLoader,
         "camvid": camvidLoader,
+        "isic18" : ISIC18Loader,
         "ade20k": ADE20KLoader,
         "mit_sceneparsing_benchmark": MITSceneParsingBenchmarkLoader,
         "cityscapes": cityscapesLoader,
