@@ -30,12 +30,13 @@ class ISIC18Loader(data.Dataset):
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.files = collections.defaultdict(list)
 
+
         if not self.test_mode:
             for folder in ["training", "training_labels", "validation" ]:
                 file_list = recursive_glob(
                     rootdir=self.root + "/" + folder + "/", suffix=".png" if folder == "training_labels" else ".jpg"
                 )
-                self.files[folder] = file_list
+                self.files[folder] = sorted(file_list)
 
     def __len__(self):
         return min(len(self.files[self.split]), len(self.files["training_labels"]))
@@ -44,11 +45,10 @@ class ISIC18Loader(data.Dataset):
         img_name = self.files[self.split][index]
         if self.split == "training":
             lbl_name = self.files["training_labels"][index]
-            print img_name
-        # "ISIC" + str(index).zfill(6) + ".jpg"
+            print img_name, lbl_name
 
+        # load and convert RGB to BGR
         img = m.imread(img_name, mode="RGB")
-        img = np.array(img, dtype=np.uint8)
 
         if self.split == "training":
             lbl = m.imread(lbl_name, mode="L")
@@ -62,9 +62,11 @@ class ISIC18Loader(data.Dataset):
 
         return img, lbl if self.split == "training" else None
 
+
     def encode_segmap(self, mask):
         # TODO
-        return np.where(mask >= 127, 255, 0)
+        # return np.where(mask >= 127, 255, 0)
+        return mask
 
     def decode_segmap(self, temp, plot=False):
         # TODO
@@ -93,17 +95,23 @@ class ISIC18Loader(data.Dataset):
 
 if __name__ == "__main__":
     local_path = "/home/bijan/Workspace/Python/pytorch-semseg/data/ISIC"
-    dst = ISICLoader(local_path, is_transform=True)
-    train_loader = data.DataLoader(dst, batch_size=4)
+    dst = ISIC18Loader(local_path, is_transform=True)
+    batch_size = 4
+    train_loader = data.DataLoader(dst, batch_size=batch_size )
     for i, data_samples in enumerate(train_loader):
         imgs, labels = data_samples
-        print i, imgs.size()
-        if i == 0:
+
+        print i, imgs.size(), labels.size()
+        if i in range(0,5):
             img = torchvision.utils.make_grid(imgs).numpy()
             img = np.transpose(img, (1, 2, 0))
-            img = img[:, :, ::-1]
             plt.imshow(img)
             plt.show()
-            for j in range(4):
-                plt.imshow(dst.decode_segmap(labels.numpy()[j]))
-                plt.show()
+            fig, ax = plt.subplots(1,batch_size,
+                                   figsize=(10,4),
+                                   sharey=True,
+                                   dpi=120)
+
+            for j in range(batch_size):
+                ax[j].imshow(dst.decode_segmap(labels.numpy()[j]))
+            plt.show()
