@@ -29,7 +29,7 @@ class ISIC18Loader(data.Dataset):
         self.test_mode = test_mode
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.files = collections.defaultdict(list)
-
+        self.n_classes = 2
 
         if not self.test_mode:
             for folder in ["training", "training_labels", "validation" ]:
@@ -62,7 +62,6 @@ class ISIC18Loader(data.Dataset):
 
         return img, lbl if self.split == "training" else None
 
-
     def encode_segmap(self, mask):
         # TODO
         # return np.where(mask >= 127, 255, 0)
@@ -94,10 +93,10 @@ class ISIC18Loader(data.Dataset):
 
 
 if __name__ == "__main__":
-    local_path = "/home/bijan/Workspace/Python/pytorch-semseg/data/ISIC"
+    local_path = "/home/bijan/workspace/pytorch-semseg/data/"
     dst = ISIC18Loader(local_path, is_transform=True)
     batch_size = 4
-    train_loader = data.DataLoader(dst, batch_size=batch_size )
+    train_loader = data.DataLoader(dst, batch_size=batch_size)
     for i, data_samples in enumerate(train_loader):
         imgs, labels = data_samples
 
