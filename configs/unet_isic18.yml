@@ -2,22 +2,22 @@ model:
     arch: unet
 data:
     dataset: isic18
-    train_split: train_aug
-    val_split: val
-    img_rows: 'same'
-    img_cols: 'same'
-    path: /home/bijan/workspace/pytorch-semseg/data
+    train_split: training
+    val_split: validation
+    img_rows: 572
+    img_cols: 572
+    path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18/
 training:
-    train_iters: 300000
-    batch_size: 1
+    train_iters: 10000
+    batch_size: 16
     val_interval: 1000
-    n_workers: 16
-    print_interval: 50
+    n_workers: 8
+    print_interval: 10
     optimizer:
         name: 'sgd'
-        lr: 1.0e-10
+        lr: 1.0e-7
         weight_decay: 0.0005
-        momentum: 0.99
+        momentum: 0.9
     loss:
         name: 'cross_entropy'
         size_average: False

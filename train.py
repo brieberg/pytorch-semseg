@@ -41,7 +41,6 @@ def train(cfg, writer, logger):
     data_loader = get_loader(cfg["data"]["dataset"])
     data_path = cfg["data"]["path"]
 
-
     t_loader = data_loader(
         data_path,
         is_transform=True,
@@ -77,7 +76,6 @@ def train(cfg, writer, logger):
     model = get_model(cfg["model"], n_classes).to(device)
 
     model = torch.nn.DataParallel(model, device_ids=range(torch.cuda.device_count()))
-
     # Setup optimizer, lr_scheduler and loss function
     optimizer_cls = get_optimizer(cfg)
     optimizer_params = {k: v for k, v in cfg["training"]["optimizer"].items() if k != "name"}
@@ -127,7 +125,6 @@ def train(cfg, writer, logger):
 
             optimizer.zero_grad()
             outputs = model(images)
-
             loss = loss_fn(input=outputs, target=labels)
 
             loss.backward()
@@ -216,7 +213,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.config) as fp:
-        print fp
         cfg = yaml.safe_load(fp)
 
     run_id = random.randint(1, 100000)

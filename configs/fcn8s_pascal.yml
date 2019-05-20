@@ -1,5 +1,5 @@
 model:
-    arch: fcn8s
+    arch: unet
 data:
     dataset: pascal
     train_split: train_aug

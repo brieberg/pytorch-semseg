@@ -19,7 +19,7 @@ def get_loader(name):
     return {
         "pascal": pascalVOCLoader,
         "camvid": camvidLoader,
-        "isic18" : ISIC18Loader,
+        "isic18": ISIC18Loader,
         "ade20k": ADE20KLoader,
         "mit_sceneparsing_benchmark": MITSceneParsingBenchmarkLoader,
         "cityscapes": cityscapesLoader,

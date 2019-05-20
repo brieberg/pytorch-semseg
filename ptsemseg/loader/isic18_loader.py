@@ -32,9 +32,10 @@ class ISIC18Loader(data.Dataset):
         self.n_classes = 2
 
         if not self.test_mode:
-            for folder in ["training", "training_labels", "validation" ]:
+            for folder in ["training", "training_labels", "validation"]:
                 file_list = recursive_glob(
-                    rootdir=self.root + "/" + folder + "/", suffix=".png" if folder == "training_labels" else ".jpg"
+                    rootdir=self.root + "/" + folder + "/",
+                    suffix=".png" if folder == "training_labels" else ".jpg"
                 )
                 self.files[folder] = sorted(file_list)
 
@@ -45,10 +46,10 @@ class ISIC18Loader(data.Dataset):
         img_name = self.files[self.split][index]
         if self.split == "training":
             lbl_name = self.files["training_labels"][index]
-            print img_name, lbl_name
 
         # load and convert RGB to BGR
-        img = m.imread(img_name, mode="RGB")
+        img = m.imread(img_name, mode="RGB")#[..., [2, 0, 1]]
+        lbl = None
 
         if self.split == "training":
             lbl = m.imread(lbl_name, mode="L")
@@ -60,27 +61,31 @@ class ISIC18Loader(data.Dataset):
         if self.is_transform:
             img, lbl = self.transform(img, lbl)
 
+        if lbl is not None:
+            lbl[lbl < 1] = 0  # Nothing
+            lbl[lbl >= 1] = 1  # Something
+
         return img, lbl if self.split == "training" else None
 
-    def encode_segmap(self, mask):
-        # TODO
-        # return np.where(mask >= 127, 255, 0)
-        return mask
 
-    def decode_segmap(self, temp, plot=False):
-        # TODO
-        return temp
+    def decode_segmap(self, lbl):
+        lbl[lbl < 1] = 0  # Nothing
+        lbl[lbl >= 1] = 255  # Something
+        return lbl
 
-    def transform(self, img, lbl):
-        # TODO colors dont seem right
-        img = m.imresize(img, (self.img_size[0], self.img_size[1]))
+    def transform(self, image, label):
+        if self.img_size == ("same", "same"):
+            pass
 
-        # NHWC -> NCHW
-        img = img.transpose(2, 0, 1)
+        image = m.imresize(image, (self.img_size[0], self.img_size[1]))
 
-        lbl = m.imresize(lbl, (self.img_size[0], self.img_size[1]))
-        lbl = self.encode_segmap(lbl)
-        return torch.from_numpy(img), torch.from_numpy(lbl)
+        # NxHxWxC -> NxCxHxW
+        image = image.transpose(2, 0, 1)
+
+        if label is not None:
+            label = m.imresize(label, (self.img_size[0], self.img_size[1]))
+
+        return torch.Tensor(image), torch.Tensor(label) if label is not None else None
 
     def augmentations(self, img, lbl):
         """TODO
@@ -89,28 +94,32 @@ class ISIC18Loader(data.Dataset):
         :param lbl:
         :return:
         """
-        pass
+        return img, lbl
 
 
 if __name__ == "__main__":
-    local_path = "/home/bijan/workspace/pytorch-semseg/data/"
-    dst = ISIC18Loader(local_path, is_transform=True)
+    local_path = "/home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18/"
+    dst = ISIC18Loader(local_path, img_size=(572, 572), is_transform=True)
     batch_size = 4
-    train_loader = data.DataLoader(dst, batch_size=batch_size)
+    train_loader = data.DataLoader(dst,
+                                   batch_size=batch_size,
+                                   num_workers=4,
+                                   shuffle=True)
+
     for i, data_samples in enumerate(train_loader):
         imgs, labels = data_samples
 
-        print i, imgs.size(), labels.size()
-        if i in range(0,5):
+        if i in range(0, 5):
             img = torchvision.utils.make_grid(imgs).numpy()
-            img = np.transpose(img, (1, 2, 0))
+            img = (np.transpose(img, (1, 2, 0)))#[..., ::-1]
             plt.imshow(img)
             plt.show()
-            fig, ax = plt.subplots(1,batch_size,
+            fig, ax = plt.subplots(1, batch_size,
                                    figsize=(10,4),
                                    sharey=True,
                                    dpi=120)
-
             for j in range(batch_size):
-                ax[j].imshow(dst.decode_segmap(labels.numpy()[j]))
+                ax[j].imshow(labels.numpy()[j])
             plt.show()
+        else:
+            break
