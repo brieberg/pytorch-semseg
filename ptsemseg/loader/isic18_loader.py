@@ -12,6 +12,9 @@ from ptsemseg.utils import recursive_glob
 
 
 class ISIC18Loader(data.Dataset):
+    def __len__(self):
+        return min(len(self.files[self.split]), len(self.files["training_labels"]))
+
     def __init__(self,
                  root,
                  split="training",
@@ -19,6 +22,7 @@ class ISIC18Loader(data.Dataset):
                  img_size=(1024, 768),
                  augmentations=None,
                  img_norm=True,
+
                  test_mode=False
                  ):
         self.root = root
@@ -27,25 +31,26 @@ class ISIC18Loader(data.Dataset):
         self.augmentations = augmentations
         self.img_norm = img_norm
         self.test_mode = test_mode
+        self.subfolder={"training": "training",
+                        "training_labels": "training_labels",
+                        "validation": "validation",
+                        "test": "test"}
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.files = collections.defaultdict(list)
         self.n_classes = 2
 
         if not self.test_mode:
-            for folder in ["training", "training_labels", "validation"]:
+            for folder in [self.subfolder["training"], self.subfolder["training_labels"], self.subfolder["validation"]]:
                 file_list = recursive_glob(
                     rootdir=self.root + "/" + folder + "/",
-                    suffix=".png" if folder == "training_labels" else ".jpg"
+                    suffix=".png" if folder == self.subfolder["training_labels"] else ".jpg"
                 )
                 self.files[folder] = sorted(file_list)
 
-    def __len__(self):
-        return min(len(self.files[self.split]), len(self.files["training_labels"]))
-
     def __getitem__(self, index):
         img_name = self.files[self.split][index]
-        if self.split == "training":
-            lbl_name = self.files["training_labels"][index]
+        if self.split == self.subfolder["training"]:
+            lbl_name = self.files[self.subfolder["training_labels"]][index]
 
         # load and convert RGB to BGR
         img = m.imread(img_name, mode="RGB")#[..., [2, 0, 1]]
