@@ -3,15 +3,15 @@ model:
 data:
     dataset: isic18
     train_split: training
-    val_split: validation
+    val_split: test
     img_rows: 572
     img_cols: 572
-    path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18/
+    path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18
 training:
     train_iters: 10000
-    batch_size: 16
+    batch_size: 2
     val_interval: 1000
-    n_workers: 8
+    n_workers: 2
     print_interval: 10
     optimizer:
         name: 'sgd'

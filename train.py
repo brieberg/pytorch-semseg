@@ -8,6 +8,7 @@ import argparse
 import numpy as np
 
 from torch.utils import data
+from torch.nn.functional import interpolate
 from tqdm import tqdm
 
 from ptsemseg.models import get_model
@@ -65,7 +66,9 @@ def train(cfg, writer, logger):
     )
 
     valloader = data.DataLoader(
-        v_loader, batch_size=cfg["training"]["batch_size"], num_workers=cfg["training"]["n_workers"]
+        v_loader,
+        batch_size=cfg["training"]["batch_size"],
+        num_workers=cfg["training"]["n_workers"]
     )
 
     # Setup Metrics
@@ -92,7 +95,8 @@ def train(cfg, writer, logger):
     if cfg["training"]["resume"] is not None:
         if os.path.isfile(cfg["training"]["resume"]):
             logger.info(
-                "Loading model and optimizer from checkpoint '{}'".format(cfg["training"]["resume"])
+                "Loading model and optimizer from checkpoint '{}'"
+                .format(cfg["training"]["resume"])
             )
             checkpoint = torch.load(cfg["training"]["resume"])
             model.load_state_dict(checkpoint["model_state"])
@@ -158,6 +162,16 @@ def train(cfg, writer, logger):
                         outputs = model(images_val)
                         val_loss = loss_fn(input=outputs, target=labels_val)
 
+                        n, c, h, w = outputs.size()
+                        nt, ht, wt = labels_val.size()
+
+                        # Handle inconsistent size between input and target
+                        if h != ht and w != wt:  # upsample labels
+                            outputs = interpolate(outputs,
+                                                  size=(ht, wt),
+                                                  mode="bilinear",
+                                                  align_corners=True)
+
                         pred = outputs.data.max(1)[1].cpu().numpy()
                         gt = labels_val.data.cpu().numpy()
 
@@ -191,7 +205,8 @@ def train(cfg, writer, logger):
                     }
                     save_path = os.path.join(
                         writer.file_writer.get_logdir(),
-                        "{}_{}_best_model.pkl".format(cfg["model"]["arch"], cfg["data"]["dataset"]),
+                        "{}_{}_best_model.pkl".format(cfg["model"]["arch"],
+                                                      cfg["data"]["dataset"]),
                     )
                     torch.save(state, save_path)
 

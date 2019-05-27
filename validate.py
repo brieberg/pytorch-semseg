@@ -1,11 +1,11 @@
 import yaml
 import torch
+import torch.nn.functional as F
 import argparse
 import timeit
 import numpy as np
 
 from torch.utils import data
-
 
 from ptsemseg.models import get_model
 from ptsemseg.loader import get_loader
@@ -74,6 +74,7 @@ def validate(cfg, args):
                     i + 1, pred.shape[0] / elapsed_time
                 )
             )
+
         running_metrics.update(gt, pred)
 
     score, class_iou = running_metrics.get_scores()
@@ -98,7 +99,7 @@ if __name__ == "__main__":
         "--model_path",
         nargs="?",
         type=str,
-        default="fcn8s_pascal_1_26.pkl",
+        default="unet_isic18_best_model.pkl",
         help="Path to the saved model",
     )
     parser.add_argument(

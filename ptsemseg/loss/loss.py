@@ -5,8 +5,7 @@ import torch.nn.functional as F
 def cross_entropy2d(input, target, weight=None, size_average=True):
     n, c, h, w = input.size()
     nt, ht, wt = target.size()
-    print("input size: ", n, c, h, w)
-    print("target size: ", nt, ht, wt)
+
     # Handle inconsistent size between input and target
     if h != ht and w != wt:  # upsample labels
         input = F.interpolate(input, size=(ht, wt), mode="bilinear", align_corners=True)
@@ -14,10 +13,6 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
     input = input.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c)
     target = target.view(-1)
     target = target.to(dtype=torch.long)
-    print("labels: ", target, target.size())
-    print(target.unique())
-    print("output: ", input, input.size())
-    print(input.unique())
 
     loss = F.cross_entropy(
         input, target, weight=weight, size_average=size_average, ignore_index=250
