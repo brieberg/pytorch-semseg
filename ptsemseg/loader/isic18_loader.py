@@ -7,39 +7,35 @@ import matplotlib.pyplot as plt
 import collections
 
 from torch.utils import data
+import torch.nn as nn
 
 from ptsemseg.utils import recursive_glob
 
 
 class ISIC18Loader(data.Dataset):
-    def __len__(self):
-        check_labels = self.split == "training" or self.split == "training"
-        return min(len(self.files[self.split]),
-                   len(self.files[self.split + "_labels"])) \
-            if check_labels else len(self.files[self.split])
-
     def __init__(self,
                  root,
                  split="training",
                  is_transform=True,
                  img_size=(1024, 768),
                  augmentations=None,
+                 greyscale=False,
                  img_norm=True,
-                 test_mode=False
-                 ):
-        self.sub_folder = {"training": "training",
-                           "training_labels": "training_labels",
-                           "validation": "validation",
-                           "final_test": "test"}
+                 test_mode=False):
+        self.sub_folder = {"training": "ISIC2018_Task1-2_Training_Input",
+                           "training_labels": "ISIC2018_Task1_Training_GroundTruth",
+                           "validation": "ISIC2018_Task1-2_Validation_Input",
+                           "final_test": "ISIC2018_Task1-2_Test_Input"}
         test_percentage = 0.1
 
         self.root = root
         self.split = split
         self.is_transform = is_transform
+        self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.augmentations = augmentations
+        self.greyscale = greyscale
         self.img_norm = img_norm
         self.test_mode = test_mode
-        self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.files = collections.defaultdict(list)
         self.n_classes = 2
 
@@ -57,7 +53,6 @@ class ISIC18Loader(data.Dataset):
                 )
                 if folder == self.sub_folder["training"]:
                     self.files["test"] = [sorted(file_list)[k] for k in test_indices]
-                    print(self.files["test"])
                     self.files["training"] = sorted(list(set(file_list) -
                                                          set(self.files["test_labels"]))
                                                     )
@@ -66,19 +61,25 @@ class ISIC18Loader(data.Dataset):
                     self.files["training_labels"] = sorted(list(set(file_list) -
                                                                 set(self.files["test_labels"]))
                                                            )
-                    print(self.files["test_labels"])
                 elif folder == self.sub_folder["validation"]:
                     self.files["validation"] = sorted(file_list)
                 else:
                     self.files["final_test"] = sorted(file_list)
+
+    def __len__(self):
+        check_labels = self.split == "training" or self.split == "training"
+        return min(len(self.files[self.split]),
+                   len(self.files[self.split + "_labels"])) \
+            if check_labels else len(self.files[self.split])
 
     def __getitem__(self, index):
         img_name = self.files[self.split][index]
         if self.split == "training" or self.split == "test":
             lbl_name = self.files[self.split + "_labels"][index]
 
-        # load and convert RGB to BGR
+        # load and convert RGB to greyscale if required
         img = m.imread(img_name, mode="RGB")  # [..., [2, 0, 1]]
+
         lbl = None
 
         if self.split == "training" or self.split == "test":
@@ -109,8 +110,13 @@ class ISIC18Loader(data.Dataset):
 
         image = m.imresize(image, (self.img_size[0], self.img_size[1]))
 
-        # NxHxWxC -> NxCxHxW
-        image = image.transpose(2, 0, 1)
+        if self.greyscale:
+            # Convert sRGB to Greyscale using lightness method
+            image = (np.max(image, axis=-1) + np.min(image, axis=-1))/2
+            image = np.expand_dims(image, 0)
+        else:
+            # NxHxWxC -> NxCxHxW
+            image = image.transpose(2, 0, 1)
 
         if label is not None:
             label = m.imresize(label, (self.img_size[0], self.img_size[1]))
@@ -129,8 +135,12 @@ class ISIC18Loader(data.Dataset):
 
 if __name__ == "__main__":
     local_path = "/home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18"
-    dst = ISIC18Loader(local_path, img_size=(572, 572), split="test", is_transform=True)
-    print(dst.__len__())
+    dst = ISIC18Loader(local_path,
+                       img_size=(572, 572),
+                       greyscale=True,
+                       split="test",
+                       is_transform=True)
+
     batch_size = 4
     train_loader = data.DataLoader(dst,
                                    batch_size=batch_size,
@@ -139,11 +149,14 @@ if __name__ == "__main__":
 
     for i, data_samples in enumerate(train_loader):
         imgs, labels = data_samples
-        print(imgs.dim())
         if i in range(0, 4):
-            img = torchvision.utils.make_grid(imgs).numpy()
-            img = (np.transpose(img, (1, 2, 0)))  # [..., ::-1]
-            plt.imshow(img)
+            fig, ax = plt.subplots(1, batch_size,
+                                   figsize=(10,4),
+                                   sharey=True,
+                                   dpi=120)
+
+            for j in range(batch_size):
+                ax[j].imshow(imgs.numpy()[j], cmap='gray', vmin=0, vmax=255)
             plt.show()
 
             fig, ax = plt.subplots(1, batch_size,

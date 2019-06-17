@@ -202,7 +202,6 @@ class unetUp(nn.Module):
         offset = outputs2.size()[2] - inputs1.size()[2]
         padding = 2 * [offset // 2, offset // 2]
         outputs1 = F.pad(inputs1, padding)
-        # TODO Rundungsfehler bei unet fixen
         return self.conv(torch.cat([outputs1, outputs2], 1))
 
 

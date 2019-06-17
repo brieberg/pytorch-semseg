@@ -1,5 +1,5 @@
 model:
-    arch: unet
+    arch: fcn8s
 data:
     dataset: isic18
     train_split: training
@@ -8,18 +8,18 @@ data:
     img_cols: 512
     path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18
 training:
-    train_iters: 10000
-    batch_size: 2
-    val_interval: 1000
-    n_workers: 2
-    print_interval: 10
+    train_iters: 93400
+    batch_size: 1
+    val_interval: 5000
+    n_workers: 8
+    print_interval: 50
     optimizer:
         name: 'sgd'
-        lr: 1.0e-7
-        weight_decay: 0.0005
+        lr: 1.0e-5
+        weight_decay: 0.0016
         momentum: 0.9
     loss:
         name: 'cross_entropy'
         size_average: False
     lr_schedule:
-    resume: unet_isic18_best_model.pkl
+    resume: fcn8s_unet_best_model.pkl
