@@ -55,7 +55,7 @@ class linknet(nn.Module):
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
-        if stride != 1 or self.inplanes != planes * block.expansion:
+        if stride != 1 or self.inplanes != int(planes) * block.expansion:
             downsample = nn.Sequential(
                 nn.Conv2d(
                     self.inplanes,

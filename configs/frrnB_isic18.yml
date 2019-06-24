@@ -1,26 +1,29 @@
 model:
-    arch: fcn8s
+    arch: frrnB
 data:
     dataset: isic18
     train_split: training
     val_split: test
-    img_rows: 512
-    img_cols: 512
+    img_rows: 256
+    img_cols: 256
     path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18
 training:
     train_iters: 51880 # 2594 Training Examples -> 20 Epochs for batch size 1
     batch_size: 2
     val_interval: 1297
     n_workers: 8
-    print_interval: 50
+    print_interval: 25
     optimizer:
         name: 'adam'
         lr: 1.0e-2
-        #weight_decay: 0.0016
         #momentum: 0.9
+        #weight_decay: 0.0005
+    lr_schedule:
+        name: 'exp_lr'
+        gamma: 0.35
     loss:
         name: 'bootstrapped_cross_entropy'
         K: 65536 # img_rows*img_cols
         size_average: False
-    lr_schedule:
-    resume: fcn8s_isic18_best_model.pkl
+    resume: None #/home/bijan/Workspace/Python/pytorch-semseg/runs/frrnB_isic18/13823/frrnB_isic18_best_model.pkl
+    visdom: False

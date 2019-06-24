@@ -53,9 +53,10 @@ class ISIC18Loader(data.Dataset):
                 )
                 if folder == self.sub_folder["training"]:
                     self.files["test"] = [sorted(file_list)[k] for k in test_indices]
-                    self.files["training"] = sorted(list(set(file_list) -
-                                                         set(self.files["test_labels"]))
-                                                    )
+                    self.files["training"] = sorted([k for k in file_list if
+                                                     k not in self.files["test_labels"]])
+                    print(len(self.files["training"]))
+
                 elif folder == self.sub_folder["training_labels"]:
                     self.files["test_labels"] = [sorted(file_list)[k] for k in test_indices]
                     self.files["training_labels"] = sorted(list(set(file_list) -
@@ -84,7 +85,7 @@ class ISIC18Loader(data.Dataset):
 
         if self.split == "training" or self.split == "test":
             lbl = m.imread(lbl_name, mode="L")
-            lbl = np.array(lbl, dtype=np.uint8)
+            lbl = np.array(lbl, dtype=np.int32)
 
         if self.augmentations is not None:
             img, lbl = self.augmentations(img, lbl)
@@ -160,7 +161,7 @@ if __name__ == "__main__":
             plt.show()
 
             fig, ax = plt.subplots(1, batch_size,
-                                   figsize=(10,4),
+                                   figsize=(10, 4),
                                    sharey=True,
                                    dpi=120)
 
