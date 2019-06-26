@@ -4,22 +4,21 @@ data:
     dataset: isic18
     train_split: training
     val_split: test
-    img_rows: 512
-    img_cols: 512
+    img_rows: 572
+    img_cols: 572
     path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18
 training:
     train_iters: 10000
-    batch_size: 2
+    batch_size: 1
     val_interval: 1000
-    n_workers: 2
+    n_workers: 4
     print_interval: 10
     optimizer:
-        name: 'sgd'
-        lr: 1.0e-7
-        weight_decay: 0.0005
-        momentum: 0.9
+        name: 'adam'
+        lr: 1.0e-3
     loss:
-        name: 'cross_entropy'
-        size_average: False
+        name: 'bootstrapped_cross_entropy'
+        size_average: True
+        K: 327184
     lr_schedule:
     resume: unet_isic18_best_model.pkl

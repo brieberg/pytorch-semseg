@@ -23,6 +23,7 @@ def test(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_file_name = os.path.split(args.model_path)[1]
+    print(model_file_name)
     model_name = model_file_name[: model_file_name.find("_")]
 
     # Setup image
@@ -32,6 +33,7 @@ def test(args):
     data_loader = get_loader(args.dataset)
     loader = data_loader(root=None, is_transform=True, img_norm=args.img_norm, test_mode=True)
     n_classes = loader.n_classes
+    print(loader.img_size)
 
     resized_img = misc.imresize(img, (loader.img_size[0], loader.img_size[1]), interp="bicubic")
 
@@ -62,6 +64,7 @@ def test(args):
     model.to(device)
 
     images = img.to(device)
+    print(images.size())
     outputs = model(images)
 
     if args.dcrf:

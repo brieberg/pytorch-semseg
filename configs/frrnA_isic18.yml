@@ -1,5 +1,5 @@
 model:
-    arch: frrnB
+    arch: frrnA
 data:
     dataset: isic18
     train_split: training
@@ -25,6 +25,5 @@ training:
         name: 'bootstrapped_cross_entropy'
         K: 65536 # img_rows*img_cols
         size_average: False
-    resume: /home/bijan/Workspace/Python/pytorch-semseg/runs/frrnB_isic18/13823/frrnB_isic18_best_model.pkl
-    #resume: None
+    resume: None #/home/bijan/Workspace/Python/pytorch-semseg/runs/frrnB_isic18/13823/frrnB_isic18_best_model.pkl
     visdom: False

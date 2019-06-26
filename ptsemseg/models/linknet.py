@@ -27,6 +27,7 @@ class linknet(nn.Module):
 
         block = residualBlock
         self.encoder1 = self._make_layer(block, filters[0], self.layers[0])
+        print(type(block), type(filters[1]), type(self.layers[1]))
         self.encoder2 = self._make_layer(block, filters[1], self.layers[1], stride=2)
         self.encoder3 = self._make_layer(block, filters[2], self.layers[2], stride=2)
         self.encoder4 = self._make_layer(block, filters[3], self.layers[3], stride=2)

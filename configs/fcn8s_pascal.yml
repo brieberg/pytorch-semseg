@@ -4,23 +4,24 @@ data:
     dataset: pascal
     train_split: train_aug
     val_split: val
-    img_rows: 'same'
-    img_cols: 'same'
+    img_rows: 512
+    img_cols: 512
     path: /home/bijan/Workspace/Python/pytorch-semseg/data/VOC/VOC2012/
     sbd_path: /home/bijan/Workspace/Python/pytorch-semseg/data/VOC/benchmark_RELEASE/
 training:
-    train_iters: 5000
-    batch_size: 1
+    train_iters: 20000
+    batch_size: 2
     val_interval: 1000
     n_workers: 16
     print_interval: 50
     optimizer:
-        name: 'sgd'
-        lr: 1.0e-10
-        weight_decay: 0.0005
-        momentum: 0.99
+        name: 'adam'
+        lr: 1.0e-3
+        #weight_decay: 0.0005
+        #momentum: 0.99
     loss:
-        name: 'cross_entropy'
+        name: 'bootstrapped_cross_entropy'
+        K: 65536 # img_rows*img_cols
         size_average: False
     lr_schedule:
     resume: fcn8s_pascal_best_model.pkl

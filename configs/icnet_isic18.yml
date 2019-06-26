@@ -1,0 +1,28 @@
+model:
+    arch: icnet
+data:
+    dataset: isic18
+    train_split: training
+    val_split: test
+    img_rows: 1025
+    img_cols: 2049
+    path: /home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18
+training:
+    train_iters: 51880 # 2594 Training Examples -> 20 Epochs for batch size 1
+    batch_size: 1
+    val_interval: 1297
+    n_workers: 8
+    print_interval: 50
+    optimizer:
+        name: 'adam'
+        lr: 1.0e-2
+        #weight_decay: 0.0016
+        #momentum: 0.9
+    loss:
+        name: 'multi_scale_cross_entropy'
+        #K: 65536 # img_rows*img_cols
+        size_average: False
+    lr_schedule:
+        name: 'exp_lr'
+        gamma: 0.15
+    resume: ne #/home/bijan/Workspace/Python/pytorch-semseg/runs/icnet_isic18/28838/icnet_isic18_best_model.pkl

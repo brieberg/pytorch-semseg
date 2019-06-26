@@ -17,7 +17,7 @@ class ISIC18Loader(data.Dataset):
                  root,
                  split="training",
                  is_transform=True,
-                 img_size=(1024, 768),
+                 img_size=(256, 256),
                  augmentations=None,
                  greyscale=False,
                  img_norm=True,
@@ -34,6 +34,7 @@ class ISIC18Loader(data.Dataset):
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.augmentations = augmentations
         self.greyscale = greyscale
+        self.mean = np.array([104.00699, 116.66877, 122.67892])
         self.img_norm = img_norm
         self.test_mode = test_mode
         self.files = collections.defaultdict(list)
@@ -137,8 +138,8 @@ class ISIC18Loader(data.Dataset):
 if __name__ == "__main__":
     local_path = "/home/bijan/Workspace/Python/pytorch-semseg/data/ISIC18"
     dst = ISIC18Loader(local_path,
-                       img_size=(572, 572),
-                       greyscale=True,
+                       img_size=(256, 256),
+                       greyscale=False,
                        split="test",
                        is_transform=True)
 
@@ -152,7 +153,7 @@ if __name__ == "__main__":
         imgs, labels = data_samples
         if i in range(0, 4):
             fig, ax = plt.subplots(1, batch_size,
-                                   figsize=(10,4),
+                                   figsize=(10, 4),
                                    sharey=True,
                                    dpi=120)
 
